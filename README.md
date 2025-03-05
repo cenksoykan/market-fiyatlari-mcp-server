@@ -31,8 +31,8 @@ Claude Desktop'un `claude_desktop_config.json` dosyasına aşağıdaki yapıland
 {
   "mcpServers": {
     "marketfiyati": {
-      "command": "node",
-      "args": ["C:/Projects/market-fiyati-mcp/build/index.js"]
+      "command": "npx",
+      "args": ["-y @enescinar/market-fiyati-mcp"]
     }
   }
 }
