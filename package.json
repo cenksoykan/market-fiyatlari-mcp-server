@@ -1,0 +1,31 @@
+{
+  "name": "market-fiyati-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Market Fiyatı API",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc -w & node --watch build/index.js",
+    "clean": "rimraf build"
+  },
+  "keywords": [
+    "mcp",
+    "market",
+    "price",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "axios": "^1.6.7",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}
