@@ -5,7 +5,6 @@ Bu proje, Market Fiyatı API'si ile entegre olan bir MCP (Model Context Protocol
 ## Özellikler
 
 - **Ürün Arama**: İsim veya anahtar kelime ile ürün arama
-- **Ürün Detayları**: ID veya barkod ile ürün bilgilerini görüntüleme
 - **Fiyat Karşılaştırma**: Farklı marketlerdeki fiyatları karşılaştırma
 - **Kaynak Erişimi**: URI tabanlı kaynak erişimi (search/ ve product/ endpoint'leri)
 - **MCP Araçları**: AI'ın doğrudan kullanabileceği veri analiz araçları
@@ -43,7 +42,7 @@ Claude Desktop'un `claude_desktop_config.json` dosyasına aşağıdaki yapıland
 Bu MCP server, Market Fiyatı API'sinin aşağıdaki endpointlerini kullanır:
 
 - `/search`: Ürün araması yapar
-- `/searchByIdentity`: ID veya barkod ile ürün getirir
+- `/searchByIdentity`: ID ile ürün getirir
 
 ## MCP Araçları
 
@@ -51,7 +50,6 @@ Sunucu aşağıdaki MCP araçlarını sağlar:
 
 - `search_products`: Ürün araması yapar
 - `get_product_by_id`: ID ile ürün getirir
-- `get_product_by_barcode`: Barkod ile ürün getirir
 - `compare_prices`: Fiyat karşılaştırması yapar
 
 ## MCP Kaynakları
