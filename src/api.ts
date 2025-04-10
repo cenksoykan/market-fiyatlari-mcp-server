@@ -1,11 +1,11 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { 
-  SearchResponse, 
-  SearchByIdentityRequest, 
-  SearchRequest,
+import {
   Product,
-  ProductDepotInfo
+  ProductDepotInfo,
+  SearchByIdentityRequest,
+  SearchRequest,
+  SearchResponse
 } from './types.js';
 
 // .env dosyasından yapılandırmayı yükle
@@ -28,7 +28,7 @@ export async function searchProducts(query: string): Promise<SearchResponse> {
     const requestData: SearchRequest = {
       keywords: query
     };
-    
+
     const response = await apiClient.post<SearchResponse>('/search', requestData);
     return response.data;
   } catch (error) {
@@ -43,13 +43,13 @@ export async function getProductById(productId: string): Promise<Product | null>
       identity: productId,
       identityType: 'id'
     };
-    
+
     const response = await apiClient.post<SearchResponse>('/searchByIdentity', requestData);
-    
+
     if (response.data.content && response.data.content.length > 0) {
       return response.data.content[0];
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error getting product by ID:', error);
@@ -60,41 +60,41 @@ export async function getProductById(productId: string): Promise<Product | null>
 export async function compareProductPrices(productId: string, market?: string): Promise<ProductComparisonResult> {
   try {
     const product = await getProductById(productId);
-    
+
     if (!product) {
       throw new Error(`Product with ID ${productId} not found`);
     }
-    
+
     let priceList = product.productDepotInfoList;
-    
+
     // Belirli bir market için filtreleme yap
     if (market) {
-      priceList = priceList.filter(item => 
-        item.marketAdi.toLowerCase() === market.toLowerCase()
+      priceList = priceList.filter(
+        item => item.marketAdi.toLowerCase() === market.toLowerCase()
       );
     }
-    
+
     // Fiyata göre sırala
     priceList.sort((a, b) => a.price - b.price);
-    
+
     // En ucuz, en pahalı ve ortalama fiyatları hesapla
     const cheapest = priceList.length > 0 ? priceList[0] : null;
     const mostExpensive = priceList.length > 0 ? priceList[priceList.length - 1] : null;
     const averagePrice = priceList.length > 0
       ? priceList.reduce((sum, item) => sum + item.price, 0) / priceList.length
       : 0;
-    
+
     return {
       product,
       priceComparison: {
         cheapest,
         mostExpensive,
         averagePrice,
-        priceRange: mostExpensive && cheapest 
-          ? mostExpensive.price - cheapest.price 
+        priceRange: mostExpensive && cheapest
+          ? mostExpensive.price - cheapest.price
           : 0,
-        priceDifferencePercentage: cheapest && mostExpensive 
-          ? ((mostExpensive.price - cheapest.price) / cheapest.price) * 100 
+        priceDifferencePercentage: cheapest && mostExpensive
+          ? ((mostExpensive.price - cheapest.price) / cheapest.price) * 100
           : 0
       }
     };

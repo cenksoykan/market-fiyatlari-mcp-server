@@ -2,24 +2,24 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
-  ListResourcesRequestSchema,
-  ReadResourceRequestSchema,
-  ListToolsRequestSchema,
   CallToolRequestSchema,
   ErrorCode,
-  McpError
+  ListResourcesRequestSchema,
+  ListToolsRequestSchema,
+  McpError,
+  ReadResourceRequestSchema
 } from "@modelcontextprotocol/sdk/types.js";
 import dotenv from "dotenv";
 import {
-  isSearchProductArgs,
-  isGetProductByIdArgs,
-  isComparePricesArgs
-} from "./types.js";
-import {
-  searchProducts,
+  compareProductPrices,
   getProductById,
-  compareProductPrices
+  searchProducts
 } from "./api.js";
+import {
+  isComparePricesArgs,
+  isGetProductByIdArgs,
+  isSearchProductArgs
+} from "./types.js";
 
 // .env dosyasından yapılandırmayı yükle
 dotenv.config();
@@ -103,12 +103,12 @@ class MarketFiyatiServer {
       ReadResourceRequestSchema,
       async (request) => {
         const uri = request.params.uri;
-        
+
         // Arama sonuçları için
         if (uri.startsWith("market-fiyati://search/")) {
           const encodedQuery = uri.replace("market-fiyati://search/", "");
           const query = decodeURIComponent(encodedQuery);
-          
+
           try {
             // Önbellekten kontrol et
             let searchResult;
@@ -118,13 +118,13 @@ class MarketFiyatiServer {
               searchResult = await searchProducts(query);
               // Önbelleğe ekle (basit bir önbellek mekanizması)
               this.searchCache.set(query, searchResult);
-              
+
               // Önbelleği 5 dakika sonra temizle
               setTimeout(() => {
                 this.searchCache.delete(query);
               }, 5 * 60 * 1000);
             }
-            
+
             return {
               contents: [{
                 uri: request.params.uri,
@@ -139,21 +139,21 @@ class MarketFiyatiServer {
             );
           }
         }
-        
+
         // Ürün detayları için
         if (uri.startsWith("market-fiyati://product/")) {
           const productId = uri.replace("market-fiyati://product/", "");
-          
+
           try {
             const product = await getProductById(productId);
-            
+
             if (!product) {
               throw new McpError(
                 ErrorCode.MethodNotFound,
                 `Ürün bulunamadı: ${productId}`
               );
             }
-            
+
             return {
               contents: [{
                 uri: request.params.uri,
@@ -168,7 +168,7 @@ class MarketFiyatiServer {
             );
           }
         }
-        
+
         throw new McpError(
           ErrorCode.InvalidRequest,
           `Desteklenmeyen kaynak: ${uri}`
@@ -268,7 +268,7 @@ class MarketFiyatiServer {
             }
 
             const product = await getProductById(args.productId);
-            
+
             if (!product) {
               return {
                 content: [{
@@ -278,7 +278,7 @@ class MarketFiyatiServer {
                 isError: true
               };
             }
-            
+
             return {
               content: [{
                 type: "text",
@@ -297,7 +297,7 @@ class MarketFiyatiServer {
             }
 
             const comparisonResult = await compareProductPrices(args.productId, args.market);
-            
+
             return {
               content: [{
                 type: "text",
@@ -314,7 +314,7 @@ class MarketFiyatiServer {
           if (error instanceof McpError) {
             throw error;
           }
-          
+
           return {
             content: [{
               type: "text",
@@ -330,7 +330,7 @@ class MarketFiyatiServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    
+
     // Bilgi mesajını stderr'e yazdır (stdout MCP protokolü için kullanılıyor)
     console.error("Market Fiyatı MCP sunucusu başlatıldı (stdio üzerinden çalışıyor)");
   }
