@@ -11,6 +11,8 @@ Bu proje, Market Fiyatı API'si ile entegre olan bir MCP (Model Context Protocol
 
 ## Kurulum
 
+### Standart Kurulum
+
 ```bash
 # Bağımlılıkları yükle
 npm install
@@ -22,9 +24,52 @@ npm run build
 npm start
 ```
 
+### Docker ile Kurulum
+
+Docker imajını oluştur:
+
+```bash
+docker build -t mcp/marketfiyati .
+```
+
 ## Claude Desktop ile Kullanım
 
-Claude Desktop'un `claude_desktop_config.json` dosyasına aşağıdaki yapılandırmayı ekleyin:
+Claude Desktop'un `claude_desktop_config.json` dosyasına aşağıdaki yapılandırmalardan uygun olanı ekleyin:
+
+### Standart Kurulum İçin
+
+```json
+{
+  "mcpServers": {
+    "marketfiyati": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/build/index.js"
+      ]
+    }
+  }
+}
+```
+
+### Docker Kurulumu İçin
+
+```json
+{
+  "mcpServers": {
+    "marketfiyati": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "mcp/marketfiyati"
+      ]
+    }
+  }
+}
+```
+
+### NPX ile Kurulum
 
 ```json
 {
