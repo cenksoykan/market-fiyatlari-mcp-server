@@ -6,6 +6,7 @@ Bu proje, Market Fiyatı API'si ile entegre olan bir MCP (Model Context Protocol
 
 - **Ürün Arama**: İsim veya anahtar kelime ile ürün arama
 - **Fiyat Karşılaştırma**: Farklı marketlerdeki fiyatları karşılaştırma
+- **Yakındaki Marketler**: Belirli bir konuma yakın marketleri listeleme
 - **Kaynak Erişimi**: URI tabanlı kaynak erişimi (search/ ve product/ endpoint'leri)
 - **MCP Araçları**: AI'ın doğrudan kullanabileceği veri analiz araçları
 
@@ -88,6 +89,7 @@ Bu MCP server, Market Fiyatı API'sinin aşağıdaki endpointlerini kullanır:
 
 - `/search`: Ürün araması yapar
 - `/searchByIdentity`: ID ile ürün getirir
+- `/nearest`: Yakındaki marketleri listeler
 
 ## MCP Araçları
 
@@ -96,6 +98,7 @@ Sunucu aşağıdaki MCP araçlarını sağlar:
 - `search_products`: Ürün araması yapar
 - `get_product_by_id`: ID ile ürün getirir
 - `compare_prices`: Fiyat karşılaştırması yapar
+- `search_nearby_markets`: Yakındaki marketleri listeler
 
 ## MCP Kaynakları
 

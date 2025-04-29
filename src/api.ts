@@ -1,9 +1,11 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import {
+  NearbyMarket,
   Product,
   ProductDepotInfo,
   SearchByIdentityRequest,
+  SearchNearbyMarketsRequest,
   SearchRequest,
   SearchResponse
 } from './types.js';
@@ -54,6 +56,22 @@ export async function getProductById(productId: string): Promise<Product | null>
   } catch (error) {
     console.error('Error getting product by ID:', error);
     throw new Error(`Failed to get product by ID: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function getNearbyMarkets(latitude: number, longitude: number, distance: number = 1): Promise<NearbyMarket[]> {
+  try {
+    const requestData: SearchNearbyMarketsRequest = {
+      latitude,
+      longitude,
+      distance
+    };
+
+    const response = await apiClient.post<NearbyMarket[]>('/nearest', requestData);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting nearby markets:', error);
+    throw new Error(`Failed to get nearby markets: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

@@ -25,6 +25,32 @@ export interface SearchResponse {
   facetMap: Record<string, Array<{ name: string; count: number }>> | null;
 }
 
+// Yakındaki marketler için tiplemeler
+export interface NearbyMarketLocation {
+  lon: number;
+  lat: number;
+}
+
+export interface NearbyMarket {
+  id: string;
+  sellerName: string;
+  location: NearbyMarketLocation;
+  marketName: string;
+  distance: number;
+}
+
+export interface SearchNearbyMarketsRequest {
+  latitude: number;
+  longitude: number;
+  distance: number;
+}
+
+export interface SearchNearbyMarketsArgs {
+  latitude: number;
+  longitude: number;
+  distance?: number;
+}
+
 export interface SearchByIdentityRequest {
   identity: string;
   identityType: "id" | "barcode";
@@ -71,5 +97,15 @@ export function isComparePricesArgs(args: any): args is ComparePricesArgs {
     args !== null &&
     typeof args.productId === "string" &&
     (args.market === undefined || typeof args.market === "string")
+  );
+}
+
+export function isSearchNearbyMarketsArgs(args: any): args is SearchNearbyMarketsArgs {
+  return (
+    typeof args === "object" &&
+    args !== null &&
+    typeof args.latitude === "number" &&
+    typeof args.longitude === "number" &&
+    (args.distance === undefined || typeof args.distance === "number")
   );
 }

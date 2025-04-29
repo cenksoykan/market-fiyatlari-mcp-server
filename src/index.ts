@@ -12,12 +12,14 @@ import {
 import dotenv from "dotenv";
 import {
   compareProductPrices,
+  getNearbyMarkets,
   getProductById,
   searchProducts
 } from "./api.js";
 import {
   isComparePricesArgs,
   isGetProductByIdArgs,
+  isSearchNearbyMarketsArgs,
   isSearchProductArgs
 } from "./types.js";
 
@@ -228,6 +230,28 @@ class MarketFiyatiServer {
               },
               required: ["productId"]
             }
+          },
+          {
+            name: "search_nearby_markets",
+            description: "Belirtilen konuma yakın marketleri listeler",
+            inputSchema: {
+              type: "object",
+              properties: {
+                latitude: {
+                  type: "number",
+                  description: "Enlem değeri"
+                },
+                longitude: {
+                  type: "number",
+                  description: "Boylam değeri"
+                },
+                distance: {
+                  type: "number",
+                  description: "Arama yarıçapı (km cinsinden, varsayılan: 1)"
+                }
+              },
+              required: ["latitude", "longitude"]
+            }
           }
         ]
       })
@@ -302,6 +326,29 @@ class MarketFiyatiServer {
               content: [{
                 type: "text",
                 text: JSON.stringify(comparisonResult, null, 2)
+              }]
+            };
+          }
+
+          // Yakındaki marketleri listele
+          if (name === "search_nearby_markets") {
+            if (!isSearchNearbyMarketsArgs(args)) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                "Geçersiz yakınlık araması parametreleri"
+              );
+            }
+
+            const nearbyMarkets = await getNearbyMarkets(
+              args.latitude,
+              args.longitude,
+              args.distance
+            );
+
+            return {
+              content: [{
+                type: "text",
+                text: JSON.stringify(nearbyMarkets, null, 2)
               }]
             };
           }
