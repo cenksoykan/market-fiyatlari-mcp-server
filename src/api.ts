@@ -2,6 +2,8 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import {
   NearbyMarket,
+  NominatimGeocodeResponse,
+  NominatimReverseResponse,
   Product,
   ProductDepotInfo,
   SearchByIdentityRequest,
@@ -22,6 +24,18 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
     // Authorization: API_KEY ? `Bearer ${API_KEY}` : undefined, // Eğer gerekirse
+  }
+});
+
+// Nominatim API için URL'yi yapılandırma sabitine ekleyelim
+const NOMINATIM_API_URL = process.env.NOMINATIM_API_URL || 'https://nominatim.openstreetmap.org';
+
+// Nominatim API için axios örneği
+const nominatimClient = axios.create({
+  baseURL: NOMINATIM_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'User-Agent': 'MarketFiyati-MCP-Server/1.0' // Nominatim isteği için kullanıcı ajanı gerekli
   }
 });
 
@@ -119,6 +133,54 @@ export async function compareProductPrices(productId: string, market?: string): 
   } catch (error) {
     console.error('Error comparing product prices:', error);
     throw new Error(`Failed to compare product prices: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// Adres metninden konum (lat/lng) bilgisi alma
+export async function getLocationFromAddress(
+  address: string,
+  limit: number = 1,
+  countryCode: string = 'tr'
+): Promise<NominatimGeocodeResponse[]> {
+  try {
+    const response = await nominatimClient.get<NominatimGeocodeResponse[]>('/search', {
+      params: {
+        q: address,
+        format: 'jsonv2',
+        limit: limit,
+        countrycodes: countryCode,
+        'accept-language': 'tr'
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error getting location from address:', error);
+    throw new Error(`Failed to get location from address: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// Konum bilgisinden (lat/lng) adres alma
+export async function getAddressFromLocation(
+  latitude: number,
+  longitude: number,
+  language: string = 'tr'
+): Promise<NominatimReverseResponse> {
+  try {
+    const response = await nominatimClient.get<NominatimReverseResponse>('/reverse', {
+      params: {
+        lat: latitude,
+        lon: longitude,
+        format: 'jsonv2',
+        'accept-language': language,
+        countrycodes: 'tr'
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error getting address from location:', error);
+    throw new Error(`Failed to get address from location: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

@@ -74,6 +74,56 @@ export interface ComparePricesArgs {
   market?: string;
 }
 
+// Nominatim API için tiplemeler
+export interface NominatimAddress {
+  road?: string;
+  neighbourhood?: string;
+  suburb?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  country?: string;
+  country_code?: string;
+}
+
+export interface NominatimReverseResponse {
+  place_id: number;
+  licence: string;
+  osm_type: string;
+  osm_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+  address: NominatimAddress;
+  boundingbox: string[];
+}
+
+export interface NominatimGeocodeResponse {
+  place_id: number;
+  licence: string;
+  osm_type: string;
+  osm_id: number;
+  boundingbox: string[];
+  lat: string;
+  lon: string;
+  display_name: string;
+  class: string;
+  type: string;
+  importance: number;
+}
+
+export interface GetLocationFromAddressArgs {
+  address: string;
+  limit?: number;
+  countryCode?: string;
+}
+
+export interface GetAddressFromLocationArgs {
+  latitude: number;
+  longitude: number;
+  language?: string;
+}
+
 // Yardımcı tip korumaları
 export function isSearchProductArgs(args: any): args is SearchProductArgs {
   return (
@@ -107,5 +157,25 @@ export function isSearchNearbyMarketsArgs(args: any): args is SearchNearbyMarket
     typeof args.latitude === "number" &&
     typeof args.longitude === "number" &&
     (args.distance === undefined || typeof args.distance === "number")
+  );
+}
+
+export function isGetLocationFromAddressArgs(args: any): args is GetLocationFromAddressArgs {
+  return (
+    typeof args === "object" &&
+    args !== null &&
+    typeof args.address === "string" &&
+    (args.limit === undefined || typeof args.limit === "number") &&
+    (args.countryCode === undefined || typeof args.countryCode === "string")
+  );
+}
+
+export function isGetAddressFromLocationArgs(args: any): args is GetAddressFromLocationArgs {
+  return (
+    typeof args === "object" &&
+    args !== null &&
+    typeof args.latitude === "number" &&
+    typeof args.longitude === "number" &&
+    (args.language === undefined || typeof args.language === "string")
   );
 }

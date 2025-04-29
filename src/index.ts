@@ -12,12 +12,16 @@ import {
 import dotenv from "dotenv";
 import {
   compareProductPrices,
+  getAddressFromLocation,
+  getLocationFromAddress,
   getNearbyMarkets,
   getProductById,
   searchProducts
 } from "./api.js";
 import {
   isComparePricesArgs,
+  isGetAddressFromLocationArgs,
+  isGetLocationFromAddressArgs,
   isGetProductByIdArgs,
   isSearchNearbyMarketsArgs,
   isSearchProductArgs
@@ -252,6 +256,50 @@ class MarketFiyatiServer {
               },
               required: ["latitude", "longitude"]
             }
+          },
+          {
+            name: "get_location_from_address",
+            description: "Adres metninden konum (enlem/boylam) bilgisi alır",
+            inputSchema: {
+              type: "object",
+              properties: {
+                address: {
+                  type: "string",
+                  description: "Konum adresi"
+                },
+                limit: {
+                  type: "number",
+                  description: "Maksimum sonuç sayısı (varsayılan: 1)"
+                },
+                countryCode: {
+                  type: "string",
+                  description: "İki harfli ülke kodu (varsayılan: 'tr')"
+                }
+              },
+              required: ["address"]
+            }
+          },
+          {
+            name: "get_address_from_location",
+            description: "Konum bilgisinden (enlem/boylam) adres bilgisi alır",
+            inputSchema: {
+              type: "object",
+              properties: {
+                latitude: {
+                  type: "number",
+                  description: "Enlem değeri"
+                },
+                longitude: {
+                  type: "number",
+                  description: "Boylam değeri"
+                },
+                language: {
+                  type: "string",
+                  description: "Adres dilini belirler (varsayılan: 'tr')"
+                }
+              },
+              required: ["latitude", "longitude"]
+            }
           }
         ]
       })
@@ -349,6 +397,52 @@ class MarketFiyatiServer {
               content: [{
                 type: "text",
                 text: JSON.stringify(nearbyMarkets, null, 2)
+              }]
+            };
+          }
+
+          // Adres metninden konum bilgisi al (geocoding)
+          if (name === "get_location_from_address") {
+            if (!isGetLocationFromAddressArgs(args)) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                "Geçersiz adres parametreleri"
+              );
+            }
+
+            const locationResults = await getLocationFromAddress(
+              args.address,
+              args.limit,
+              args.countryCode
+            );
+
+            return {
+              content: [{
+                type: "text",
+                text: JSON.stringify(locationResults, null, 2)
+              }]
+            };
+          }
+
+          // Konum bilgisinden adres al (reverse geocoding)
+          if (name === "get_address_from_location") {
+            if (!isGetAddressFromLocationArgs(args)) {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                "Geçersiz konum parametreleri"
+              );
+            }
+
+            const addressResult = await getAddressFromLocation(
+              args.latitude,
+              args.longitude,
+              args.language
+            );
+
+            return {
+              content: [{
+                type: "text",
+                text: JSON.stringify(addressResult, null, 2)
               }]
             };
           }
